@@ -197,14 +197,14 @@ interface CPPNShaderBackgroundProps {
 }
 
 export default function CPPNShaderBackground({
-  className = "absolute inset-0 -z-10 w-full h-full bg-black",
+  className = "absolute inset-0 -z-10 w-full h-[120%] ",
   enableAnimation = true,
   animationDuration = 1.5,
   animationDelay = 0.3,
   planePosition = [0, -0.75, -0.5],
   planeSize = [4, 4],
   showOverlay = true,
-  overlayClass = "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20",
+  overlayClass = "pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/30 via-transparent to-[#0a0a0a]/20",
   cameraConfig = {},
 }: CPPNShaderBackgroundProps) {
   const canvasRef = useRef(null);
