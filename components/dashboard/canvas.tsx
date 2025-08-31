@@ -1,82 +1,154 @@
 "use client";
+import { useState, useRef } from "react";
+import {
+  ComponentRegistry,
+  BaseComponent,
+} from "../../lib/components-registry";
 
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Grid3X3, Minus, Plus, Redo2, Undo2, TypeIcon } from "lucide-react";
+interface PositionedComponent extends BaseComponent {
+  x: number;
+  y: number;
+}
 
 export function CanvasArea() {
+  const [canvasComponents, setCanvasComponents] = useState<
+    PositionedComponent[]
+  >([]);
+  const [draggedComponent, setDraggedComponent] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("application/json");
+    if (!data) return;
+
+    const dropped: BaseComponent = JSON.parse(data);
+    const canvasRect = canvasRef.current?.getBoundingClientRect();
+
+    if (canvasRect) {
+      // Position the component where it was dropped
+      const x = e.clientX - canvasRect.left;
+      const y = e.clientY - canvasRect.top;
+
+      const newComp: PositionedComponent = {
+        ...dropped,
+        id: `${dropped.type}-${Date.now()}`,
+        x,
+        y,
+      };
+
+      setCanvasComponents((prev) => [...prev, newComp]);
+    }
+  };
+
+  const handleComponentMouseDown = (
+    e: React.MouseEvent,
+    componentId: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const component = canvasComponents.find((comp) => comp.id === componentId);
+    if (!component) return;
+
+    const canvasRect = canvasRef.current?.getBoundingClientRect();
+    if (!canvasRect) return;
+
+    // Calculate offset from mouse to component's top-left corner
+    const offsetX = e.clientX - canvasRect.left - component.x;
+    const offsetY = e.clientY - canvasRect.top - component.y;
+
+    setDraggedComponent(componentId);
+    setDragOffset({ x: offsetX, y: offsetY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!draggedComponent) return;
+
+    const canvasRect = canvasRef.current?.getBoundingClientRect();
+    if (!canvasRect) return;
+
+    const newX = e.clientX - canvasRect.left - dragOffset.x;
+    const newY = e.clientY - canvasRect.top - dragOffset.y;
+
+    setCanvasComponents((prev) =>
+      prev.map((comp) =>
+        comp.id === draggedComponent
+          ? { ...comp, x: Math.max(0, newX), y: Math.max(0, newY) }
+          : comp
+      )
+    );
+  };
+
+  const handleMouseUp = () => {
+    setDraggedComponent(null);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  const deleteComponent = (componentId: string) => {
+    setCanvasComponents((prev) =>
+      prev.filter((comp) => comp.id !== componentId)
+    );
+  };
+
   return (
-    <div className="h-[100vh] w-full flex items-center justify-center overflow-auto ">
+    <div className="h-[100vh] w-full flex items-center justify-center overflow-auto">
       <div className="relative w-full h-full max-w-[1160px]">
-        {/* Workspace center */}
-        <div className="flex items-center justify-center py-10">
-          {/* Artboard */}
-
-          {/* Photo occupying the lower portion */}
-
-          {/* MUST use the Source URL as instructed */}
-          {/* <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-08-30%20at%205.05.53%E2%80%AFPM-gGXgi79KiLhcYGfuzqfB1X4vf7c6KH.png"
-              alt="Person standing in a field with mountains behind, poster image"
-              className="h-full w-full object-cover"
-            /> */}
-
-          {/* Bottom floating toolbar */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-24">
-            <div className="flex items-center gap-1 rounded-lg bg-zinc-900/90 border border-zinc-800 px-2 py-1.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-300 hover:text-white hover:bg-zinc-800"
+        <div
+          ref={canvasRef}
+          className="relative w-full h-full border-2 border-dashed border-zinc-700 overflow-hidden"
+          onDrop={handleDrop}
+          onDragOver={(e) => e.preventDefault()}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp} // Stop dragging if mouse leaves canvas
+        >
+          {canvasComponents.map((comp) => (
+            <div
+              key={comp.id}
+              className="absolute group cursor-move"
+              style={{
+                left: comp.x,
+                top: comp.y,
+                transform:
+                  draggedComponent === comp.id ? "scale(1.05)" : "scale(1)",
+                transition:
+                  draggedComponent === comp.id ? "none" : "transform 0.1s ease",
+                zIndex: draggedComponent === comp.id ? 1000 : 1,
+              }}
+              onMouseDown={(e) => handleComponentMouseDown(e, comp.id)}
+            >
+              {/* Delete button - appears on hover */}
+              <button
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center hover:bg-red-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteComponent(comp.id);
+                }}
+                title="Delete component"
               >
-                <Undo2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-300 hover:text-white hover:bg-zinc-800"
-              >
-                <Redo2 className="h-4 w-4" />
-              </Button>
+                ×
+              </button>
 
-              <Separator orientation="vertical" className="mx-1 bg-zinc-800" />
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-300 hover:text-white hover:bg-zinc-800"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-300 hover:text-white hover:bg-zinc-800"
-              >
-                <TypeIcon className="h-4 w-4" />
-              </Button>
-
-              <Separator orientation="vertical" className="mx-1 bg-zinc-800" />
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-zinc-300 hover:text-white hover:bg-zinc-800"
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <div className="px-2 text-xs text-zinc-200">36% ^</div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-zinc-300 hover:text-white hover:bg-zinc-800"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+              {/* Component content */}
+              <div className="pointer-events-none">
+                {ComponentRegistry[comp.type].render(comp)}
               </div>
             </div>
-          </div>
+          ))}
+
+          {/* Empty state */}
+          {canvasComponents.length === 0 && (
+            <div className="flex flex-col items-center justify-center w-full h-full text-zinc-500">
+              <div className="text-lg font-medium mb-2">
+                Drop components here
+              </div>
+              <div className="text-sm">
+                Drag components from the sidebar to get started
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
