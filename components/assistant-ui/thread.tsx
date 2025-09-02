@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MarkdownText } from "./markdown-text";
 import { ToolFallback } from "./tool-fallback";
+import { useMessage } from "@assistant-ui/react";
+import { parseXml } from "@/lib/parser";
 
 export const Thread: FC = () => {
   return (
@@ -231,6 +233,9 @@ const MessageError: FC = () => {
 };
 
 const AssistantMessage: FC = () => {
+  const msg = useMessage((m) => m);
+  console.log(msg.content.length > 0 && parseXml(msg.content[0].text));
+
   return (
     <MessagePrimitive.Root asChild>
       <motion.div
