@@ -8,7 +8,7 @@ import { stripIndents } from "./stripindents";
 export const baseReactPrompt = `<boltArtifact id=\"project-import\" title=\"Project Files\"><boltAction type=\"file\" filePath=\"eslint.config.js\">import js from '@eslint/js';\nimport globals from 'globals';\nimport reactHooks from 'eslint-plugin-react-hooks';\nimport reactRefresh from 'eslint-plugin-react-refresh';\nimport tseslint from 'typescript-eslint';\n\nexport default tseslint.config(\n  { ignores: ['dist'] },\n  {\n    extends: [js.configs.recommended, ...tseslint.configs.recommended],\n    files: ['**/*.{ts,tsx}'],\n    languageOptions: {\n      ecmaVersion: 2020,\n      globals: globals.browser,\n    },\n    plugins: {\n      'react-hooks': reactHooks,\n      'react-refresh': reactRefresh,\n    },\n    rules: {\n      ...reactHooks.configs.recommended.rules,\n      'react-refresh/only-export-components': [\n        'warn',\n        { allowConstantExport: true },\n      ],\n    },\n  }\n);\n</boltAction><boltAction type=\"file\" filePath=\"index.html\"><!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/vite.svg\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Vite + React + TS</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.tsx\"></script>\n  </body>\n</html>\n</boltAction><boltAction type=\"file\" filePath=\"package.json\">{\n  \"name\": \"vite-react-typescript-starter\",\n  \"private\": true,\n  \"version\": \"0.0.0\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"vite build\",\n    \"lint\": \"eslint .\",\n    \"preview\": \"vite preview\"\n  },\n  \"dependencies\": {\n    \"lucide-react\": \"^0.344.0\",\n    \"react\": \"^18.3.1\",\n    \"react-dom\": \"^18.3.1\"\n  },\n  \"devDependencies\": {\n    \"@eslint/js\": \"^9.9.1\",\n    \"@types/react\": \"^18.3.5\",\n    \"@types/react-dom\": \"^18.3.0\",\n    \"@vitejs/plugin-react\": \"^4.3.1\",\n    \"autoprefixer\": \"^10.4.18\",\n    \"eslint\": \"^9.9.1\",\n    \"eslint-plugin-react-hooks\": \"^5.1.0-rc.0\",\n    \"eslint-plugin-react-refresh\": \"^0.4.11\",\n    \"globals\": \"^15.9.0\",\n    \"postcss\": \"^8.4.35\",\n    \"tailwindcss\": \"^3.4.1\",\n    \"typescript\": \"^5.5.3\",\n    \"typescript-eslint\": \"^8.3.0\",\n    \"vite\": \"^5.4.2\"\n  }\n}\n</boltAction><boltAction type=\"file\" filePath=\"postcss.config.js\">export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n};\n</boltAction><boltAction type=\"file\" filePath=\"tailwind.config.js\">/** @type {import('tailwindcss').Config} */\nexport default {\n  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n</boltAction><boltAction type=\"file\" filePath=\"tsconfig.app.json\">{\n  \"compilerOptions\": {\n    \"target\": \"ES2020\",\n    \"useDefineForClassFields\": true,\n    \"lib\": [\"ES2020\", \"DOM\", \"DOM.Iterable\"],\n    \"module\": \"ESNext\",\n    \"skipLibCheck\": true,\n\n    /* Bundler mode */\n    \"moduleResolution\": \"bundler\",\n    \"allowImportingTsExtensions\": true,\n    \"isolatedModules\": true,\n    \"moduleDetection\": \"force\",\n    \"noEmit\": true,\n    \"jsx\": \"react-jsx\",\n\n    /* Linting */\n    \"strict\": true,\n    \"noUnusedLocals\": true,\n    \"noUnusedParameters\": true,\n    \"noFallthroughCasesInSwitch\": true\n  },\n  \"include\": [\"src\"]\n}\n</boltAction><boltAction type=\"file\" filePath=\"tsconfig.json\">{\n  \"files\": [],\n  \"references\": [\n    { \"path\": \"./tsconfig.app.json\" },\n    { \"path\": \"./tsconfig.node.json\" }\n  ]\n}\n</boltAction><boltAction type=\"file\" filePath=\"tsconfig.node.json\">{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"lib\": [\"ES2023\"],\n    \"module\": \"ESNext\",\n    \"skipLibCheck\": true,\n\n    /* Bundler mode */\n    \"moduleResolution\": \"bundler\",\n    \"allowImportingTsExtensions\": true,\n    \"isolatedModules\": true,\n    \"moduleDetection\": \"force\",\n    \"noEmit\": true,\n\n    /* Linting */\n    \"strict\": true,\n    \"noUnusedLocals\": true,\n    \"noUnusedParameters\": true,\n    \"noFallthroughCasesInSwitch\": true\n  },\n  \"include\": [\"vite.config.ts\"]\n}\n</boltAction><boltAction type=\"file\" filePath=\"vite.config.ts\">import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\n\n// https://vitejs.dev/config/\nexport default defineConfig({\n  plugins: [react()],\n  optimizeDeps: {\n    exclude: ['lucide-react'],\n  },\n});\n</boltAction><boltAction type=\"file\" filePath=\"src/App.tsx\">import React from 'react';\n\nfunction App() {\n  return (\n    <div className=\"min-h-screen bg-gray-100 flex items-center justify-center\">\n      <p>Start prompting (or editing) to see magic happen :)</p>\n    </div>\n  );\n}\n\nexport default App;\n</boltAction><boltAction type=\"file\" filePath=\"src/index.css\">@tailwind base;\n@tailwind components;\n@tailwind utilities;\n</boltAction><boltAction type=\"file\" filePath=\"src/main.tsx\">import { StrictMode } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport App from './App.tsx';\nimport './index.css';\n\ncreateRoot(document.getElementById('root')!).render(\n  <StrictMode>\n    <App />\n  </StrictMode>\n);\n</boltAction><boltAction type=\"file\" filePath=\"src/vite-env.d.ts\">/// <reference types=\"vite/client\" />\n</boltAction></boltArtifact>`;
 
 export const BASE_PROMPT =
-  "For all designs I ask you to make, have them be beautiful, not cookie cutter. Make webpages that are fully featured and worthy for production.\n\nBy default, this template supports JSX syntax with Tailwind CSS classes, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.\n\nUse icons from lucide-react for logos.\n\nUse stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.\n\n" +
+  // "Only Use React Code. For all designs I ask you to make, have them be beautiful, not cookie cutter. Make webpages that are fully featured and worthy for production.\n\nBy default, this template supports JSX syntax with Tailwind CSS classes, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.\n\nUse icons from lucide-react for logos.\n\nUse stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.\n\n" +
   baseReactPrompt;
 
 export const getSystemPrompt = (cwd: string = WORK_DIR) => `
@@ -173,15 +173,15 @@ ULTRA IMPORTANT: Think first and reply with the artifact that contains all neces
 
 Here are some examples of correct usage of artifacts:
 
+
 <examples>
   <example>
     <user_query>Can you help me create a JavaScript function to calculate the factorial of a number?</user_query>
-
     <assistant_response>
       Certainly, I can help you create a JavaScript function to calculate the factorial of a number.
-
+\`\`\`
       <boltArtifact id="factorial-function" title="JavaScript Factorial Function">
-        <boltAction type="file" filePath="index.js">
+        <boltAction type="file" filePath="index.js" description="Defines a recursive function to calculate factorial of a number.">
           function factorial(n) {
            ...
           }
@@ -189,10 +189,11 @@ Here are some examples of correct usage of artifacts:
           ...
         </boltAction>
 
-        <boltAction type="shell">
+        <boltAction type="shell" description="Executes the index.js file using Node.js.">
           node index.js
         </boltAction>
-      </boltArtifact>
+      </boltArtifact> 
+      \`\`\`
     </assistant_response>
   </example>
 
@@ -201,9 +202,9 @@ Here are some examples of correct usage of artifacts:
 
     <assistant_response>
       Certainly! I'd be happy to help you build a snake game using JavaScript and HTML5 Canvas. This will be a basic implementation that you can later expand upon. Let's create the game step by step.
-
+\`\`\`
       <boltArtifact id="snake-game" title="Snake Game in HTML and JavaScript">
-        <boltAction type="file" filePath="package.json">
+        <boltAction type="file" filePath="package.json"  description="Project configuration and scripts, including dependency on Vite.">
           {
             "name": "snake",
             "scripts": {
@@ -213,19 +214,19 @@ Here are some examples of correct usage of artifacts:
           }
         </boltAction>
 
-        <boltAction type="shell">
+        <boltAction type="shell" description="Installs Vite as a dev dependency.">
           npm install --save-dev vite
         </boltAction>
 
-        <boltAction type="file" filePath="index.html">
+        <boltAction type="file" filePath="index.html" description="Main HTML file containing game canvas.">
           ...
         </boltAction>
 
-        <boltAction type="shell">
+        <boltAction type="shell" description="Starts development server with Vite.">
           npm run dev
         </boltAction>
       </boltArtifact>
-
+\`\`\`
       Now you can play the Snake game by opening the provided local server URL in your browser. Use the arrow keys to control the snake. Eat the red food to grow and increase your score. The game ends if you hit the wall or your own tail.
     </assistant_response>
   </example>
@@ -235,9 +236,9 @@ Here are some examples of correct usage of artifacts:
 
     <assistant_response>
       Certainly! I'll create a bouncing ball with real gravity using React. We'll use the react-spring library for physics-based animations.
-
+\`\`\`
       <boltArtifact id="bouncing-ball-react" title="Bouncing Ball with Gravity in React">
-        <boltAction type="file" filePath="package.json">
+        <boltAction type="file" filePath="package.json" description="Defines project metadata, dependencies, and build scripts.">
           {
             "name": "bouncing-ball",
             "private": true,
@@ -262,27 +263,27 @@ Here are some examples of correct usage of artifacts:
           }
         </boltAction>
 
-        <boltAction type="file" filePath="index.html">
+        <boltAction type="file" filePath="index.html" description="HTML file with root div for React app.">
           ...
         </boltAction>
 
-        <boltAction type="file" filePath="src/main.jsx">
+        <boltAction type="file" filePath="src/main.jsx" description="Entry point of the React application.">
           ...
         </boltAction>
 
-        <boltAction type="file" filePath="src/index.css">
+        <boltAction type="file" filePath="src/index.css" description="Global CSS styles for the app.">
           ...
         </boltAction>
 
-        <boltAction type="file" filePath="src/App.jsx">
+        <boltAction type="file" filePath="src/App.jsx" description="Main React component with bouncing ball logic using react-spring.">
           ...
         </boltAction>
 
-        <boltAction type="shell">
+        <boltAction type="shell" description="Starts the dev server to preview the app.">
           npm run dev
         </boltAction>
       </boltArtifact>
-
+\`\`\`
       You can now view the bouncing ball animation in the preview. The ball will start falling from the top of the screen and bounce realistically when it hits the bottom.
     </assistant_response>
   </example>

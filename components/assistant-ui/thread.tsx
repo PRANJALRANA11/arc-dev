@@ -6,7 +6,13 @@ import {
   BranchPickerPrimitive,
   ErrorPrimitive,
 } from "@assistant-ui/react";
-import type { FC } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type FC,
+  type ReactNode,
+} from "react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -18,6 +24,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Square,
+  Loader2,
 } from "lucide-react";
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
@@ -27,7 +34,11 @@ import { cn } from "@/lib/utils";
 import { MarkdownText } from "./markdown-text";
 import { ToolFallback } from "./tool-fallback";
 import { useMessage } from "@assistant-ui/react";
-import { parseXml } from "@/lib/parser";
+import { createXmlParser } from "@/lib/parser";
+import { Step } from "@/lib/types";
+import { AnimatedSpan, Terminal, TypingAnimation } from "../magicui/terminal";
+import { AppContext } from "@/app/context/contextApi";
+import { useContext } from "react";
 
 export const Thread: FC = () => {
   return (
@@ -232,40 +243,90 @@ const MessageError: FC = () => {
   );
 };
 
-const AssistantMessage: FC = () => {
+export const AssistantMessage: FC = () => {
+  const { allSteps, setAllSteps } = useContext(AppContext);
+  const [showSuccess, setShowSuccess] = useState(false);
   const msg = useMessage((m) => m);
-  console.log(msg.content.length > 0 && parseXml(msg.content[0].text));
+  const parseChunk = createXmlParser();
+  const newSteps = parseChunk(msg.content[0]?.text ?? "");
+
+  useEffect(() => {
+    setAllSteps([...newSteps]);
+  }, [newSteps.length]);
+
+  useEffect(() => {
+    // Show success message only once when all steps are complete
+    if (
+      allSteps.length > 0 &&
+      allSteps.every((step) => step.status === "completed")
+    ) {
+      setShowSuccess(true);
+    }
+  }, [allSteps]);
 
   return (
     <MessagePrimitive.Root asChild>
       <motion.div
-        className="relative mx-auto grid w-full max-w-[var(--thread-max-width)] grid-cols-[auto_auto_1fr] grid-rows-[auto_1fr] px-[var(--thread-padding-x)] py-4"
+        className="relative mx-auto w-full max-w-[var(--thread-max-width)]  grid-rows-[auto_1fr]  py-4"
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role="assistant"
       >
-        <div className="ring-border bg-background col-start-1 row-start-1 flex size-8 shrink-0 items-center justify-center rounded-full ring-1">
-          <StarIcon size={14} />
-        </div>
+        <div>
+          <div className="flex gap-2">
+            <div className="ring-border bg-background col-start-1 row-start-1 flex size-8 shrink-0 items-center justify-center rounded-full ring-1">
+              <StarIcon size={14} />
+            </div>
+            <div className="mt-8">
+              <Terminal className="w-full">
+                <TypingAnimation>&gt; npm init </TypingAnimation>
 
-        <div className="text-foreground col-span-2 col-start-2 row-start-1 ml-4 break-words leading-7">
-          <MessagePrimitive.Content
-            components={{
-              Text: MarkdownText,
-              tools: { Fallback: ToolFallback },
-            }}
-          />
-          <MessageError />
+                {allSteps.map(
+                  (step): ReactNode => (
+                    <div key={step.id} className="flex items-center gap-2">
+                      {step.status === "pending" ? (
+                        <Loader2
+                          className="animate-spin text-gray-500"
+                          size={14}
+                        />
+                      ) : (
+                        <CheckIcon className="text-green-500" size={14} />
+                      )}
+                      <AnimatedSpan className="text-green-500">
+                        {step.id != 1
+                          ? `${step.title}- ${step.description}`
+                          : `${step.title}`}{" "}
+                      </AnimatedSpan>
+                    </div>
+                  )
+                )}
+
+                {showSuccess && (
+                  <TypingAnimation className="text-muted-foreground">
+                    Success! Project initialization completed.
+                  </TypingAnimation>
+                )}
+              </Terminal>
+            </div>
+          </div>
+
+          <div className="text-foreground col-span-2 col-start-2 row-start-1 ml-10 mt-8 break-words leading-7">
+            <MessagePrimitive.Content
+              components={{
+                Text: MarkdownText,
+                tools: { Fallback: ToolFallback },
+              }}
+            />
+            <MessageError />
+          </div>
         </div>
 
         <AssistantActionBar />
-
         <BranchPicker className="col-start-2 row-start-2 -ml-2 mr-2" />
       </motion.div>
     </MessagePrimitive.Root>
   );
 };
-
 const AssistantActionBar: FC = () => {
   return (
     <ActionBarPrimitive.Root

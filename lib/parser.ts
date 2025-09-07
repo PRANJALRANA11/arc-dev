@@ -1,4 +1,4 @@
-import type { Step, StepType } from "./types";
+import { Step, StepType } from "./types";
 
 /*
  * Parse input XML and convert it into steps.
@@ -28,64 +28,63 @@ import type { Step, StepType } from "./types";
  *
  * The input can have strings in the middle they need to be ignored
  */
-export function parseXml(response: string): Step[] {
-  // Extract the XML content between <boltArtifact> tags
-  const xmlMatch = response.match(
-    /<boltArtifact[^>]*>([\s\S]*?)<\/boltArtifact>/
-  );
-
-  if (!xmlMatch) {
-    return [];
-  }
-
-  const xmlContent = xmlMatch[1];
-  const steps: Step[] = [];
+export function createXmlParser() {
+  let buffer = "";
   let stepId = 1;
+  let artifactTitleFound = false;
 
-  // Extract artifact title
-  const titleMatch = response.match(/title="([^"]*)"/);
-  const artifactTitle = titleMatch ? titleMatch[1] : "Project Files";
+  return function parseChunk(chunk: string): Step[] {
+    buffer += chunk;
+    const steps: Step[] = [];
 
-  // Add initial artifact step
-  steps.push({
-    id: stepId++,
-    title: artifactTitle,
-    description: "",
-    type: StepType.CreateFolder,
-    status: "pending",
-  });
-
-  // Regular expression to find boltAction elements
-  const actionRegex =
-    /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g;
-
-  let match;
-  while ((match = actionRegex.exec(xmlContent)) !== null) {
-    const [, type, filePath, content] = match;
-
-    if (type === "file") {
-      // File creation step
-      steps.push({
-        id: stepId++,
-        title: `Create ${filePath || "file"}`,
-        description: "",
-        type: StepType.CreateFile,
-        status: "pending",
-        code: content.trim(),
-        path: filePath,
-      });
-    } else if (type === "shell") {
-      // Shell command step
-      steps.push({
-        id: stepId++,
-        title: "Run command",
-        description: "",
-        type: StepType.RunScript,
-        status: "pending",
-        code: content.trim(),
-      });
+    // Capture artifact title once
+    if (!artifactTitleFound) {
+      const titleMatch = buffer.match(/title="([^"]*)"/);
+      if (titleMatch) {
+        artifactTitleFound = true;
+        steps.push({
+          id: stepId++,
+          title: titleMatch[1],
+          description: "",
+          type: StepType.CreateFolder,
+          status: "pending",
+        });
+      }
     }
-  }
 
-  return steps;
+    // Process complete boltAction blocks
+    let match: RegExpExecArray | null;
+    const actionRegex =
+      /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?(?:\s+description="([^"]*)")?>([\s\S]*?)<\/boltAction>/;
+
+    while ((match = actionRegex.exec(buffer)) !== null) {
+      const [, type, filePath, description, content] = match;
+
+      if (type === "file") {
+        steps.push({
+          id: stepId++,
+          title: `Create ${filePath || "file"}`,
+          description: description,
+          type: StepType.CreateFile,
+          status: "pending",
+          code: content.trim(),
+          path: filePath,
+        });
+      } else if (type === "shell") {
+        steps.push({
+          id: stepId++,
+          title: `Run Command- ${content.trim()}`,
+          description: description,
+          type: StepType.RunScript,
+          status: "pending",
+          code: content.trim(),
+        });
+      }
+
+      // ✂️ Remove this match from buffer so it won’t repeat
+      buffer = buffer.slice(match.index + match[0].length);
+    }
+
+    return steps;
+  };
 }

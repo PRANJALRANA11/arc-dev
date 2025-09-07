@@ -10,8 +10,9 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.23",
-    "@assistant-ui/react": "^0.10.45",
+    "@assistant-ui/react": "^0.10.49",
     "@assistant-ui/react-ai-sdk": "^1.0.5",
+    "@assistant-ui/react-data-stream": "^0.10.1",
     "@assistant-ui/react-markdown": "^0.10.9",
     "@calcom/embed-react": "^1.5.3",
     "@clerk/nextjs": "^6.31.5",
@@ -36,6 +37,7 @@
     "@tiptap/extension-code-block-lowlight": "^3.3.0",
     "@tiptap/react": "^3.3.0",
     "@tiptap/starter-kit": "^3.3.0",
+    "@webcontainer/api": "^1.6.1",
     "ai": "^5.0.29",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -17,6 +17,7 @@ export function MyRuntimeProvider({
   const runtime = useChatRuntime({
     api: "/api/v1/chat",
     cloud,
+
     // All standard useChat options are supported
   });
 
