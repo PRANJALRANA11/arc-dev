@@ -1,6 +1,15 @@
-import React, { useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { FolderTree, File, ChevronRight, ChevronDown } from "lucide-react";
-import { FileItem } from "../lib/types";
+import { FileItem, FileViewItem } from "../lib/types";
+
+import { AppContext } from "@/app/context/contextApi";
+import { TreeNode, TreeView } from "./ui/tree-view";
 
 interface FileExplorerProps {
   files: FileItem[];
@@ -64,21 +73,50 @@ function FileNode({ item, depth, onFileClick }: FileNodeProps) {
 }
 
 export function FileExplorer({ files, onFileSelect }: FileExplorerProps) {
+  const [fileViewerData, setFileViewerData] = useState<FileViewItem[]>([]);
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const itemsWithId: FileViewItem[] = files.map((item, index) => ({
+      ...item,
+      id: `${index + 1}`,
+      children: item.children
+        ? item.children.map((child, childIndex) => ({
+            ...child,
+            id: `${index + 1}-${childIndex + 1}`, // child id can be hierarchical
+          }))
+        : undefined,
+    }));
+
+    setFileViewerData(itemsWithId);
+  }, [files]);
+
+  const handleClick = (node: TreeNode) => {
+    if (node.type == "file") {
+      onFileSelect(node);
+    }
+  };
+
   return (
-    <div className="bg-gray-900 rounded-lg shadow-lg p-4 h-full overflow-auto">
+    <div className="bg-black border border-white rounded-lg shadow-lg p-4 h-full overflow-auto">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-100">
         <FolderTree className="w-5 h-5" />
         File Explorer
       </h2>
       <div className="space-y-1">
-        {files.map((file, index) => (
+        {/* {files.map((file, index) => (
           <FileNode
             key={`${file.path}-${index}`}
             item={file}
             depth={0}
             onFileClick={onFileSelect}
           />
-        ))}
+        ))} */}
+        <TreeView
+          data={fileViewerData}
+          onNodeClick={(node) => handleClick(node)}
+          defaultExpandedIds={["1"]}
+        />
       </div>
     </div>
   );

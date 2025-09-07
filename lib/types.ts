@@ -28,6 +28,14 @@ export interface FileItem {
   content?: string;
   path: string;
 }
+export interface FileViewItem {
+  id: string;
+  name: string;
+  type: "file" | "folder";
+  children?: FileViewItem[];
+  content?: string;
+  path: string;
+}
 
 export interface FileViewerProps {
   file: FileItem | null;

@@ -24,17 +24,17 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<"code" | "preview">("code");
 
   const webcontainer: WebContainer | undefined = useWebContainer();
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
   useEffect(() => {
-    let originalFiles = [...files];
-    let updateHappened = false;
-    allSteps
-      .filter(({ status }) => status === "pending")
-      .map((step) => {
-        updateHappened = true;
-        if (step?.type === StepType.CreateFile) {
-          let parsedPath = step.path?.split("/") ?? []; // ["src", "components", "App.tsx"]
-          let currentFileStructure = [...originalFiles]; // {}
+    const processStepsGradually = async () => {
+      let originalFiles = [...files];
+
+      for (const step of allSteps) {
+        if (step.status === "pending" && step.type === StepType.CreateFile) {
+          let parsedPath = step.path?.split("/") ?? [];
+          let currentFileStructure = [...originalFiles];
           const finalAnswerRef = currentFileStructure;
 
           let currentFolder = "";
@@ -59,12 +59,11 @@ export default function Page() {
                 file.content = step.code;
               }
             } else {
-              /// in a folder
+              // folder
               const folder = currentFileStructure.find(
                 (x) => x.path === currentFolder
               );
               if (!folder) {
-                // create the folder
                 currentFileStructure.push({
                   name: currentFolderName,
                   type: "folder",
@@ -72,38 +71,39 @@ export default function Page() {
                   children: [],
                 });
               }
-
               currentFileStructure = currentFileStructure.find(
                 (x) => x.path === currentFolder
               )!.children!;
             }
           }
+
           originalFiles = finalAnswerRef;
+
+          // Update files state for streaming effect
+          setFiles([...originalFiles]);
+
+          // Wait before processing the next step
+          await delay(5000); // adjust delay as needed (500ms here)
+          // Mark this step as completed gradually
+          setAllSteps((prev) =>
+            prev.map((s) =>
+              s.id === step.id ? { ...s, status: "completed" } : s
+            )
+          );
         }
-      });
+      }
+    };
 
-    if (updateHappened) {
-      setFiles(originalFiles);
-
-      setAllSteps((allSteps: Step[]) =>
-        allSteps.map((s: Step) => {
-          return {
-            ...s,
-            status: "completed",
-          };
-        })
-      );
-    }
-    console.log("myfiles", files);
-  }, [allSteps, files]);
+    processStepsGradually();
+  }, [allSteps]);
 
   useEffect(() => {
-    const createMountStructure = (files: FileItem[]): Record<string, any> => {
-      const mountStructure: Record<string, any> = {};
+    if (!webcontainer) return;
 
+    const createMountStructure = (files: FileItem[]) => {
+      const mountStructure: Record<string, any> = {};
       const processFile = (file: FileItem, isRootFolder: boolean) => {
         if (file.type === "folder") {
-          // For folders, create a directory entry
           mountStructure[file.name] = {
             directory: file.children
               ? Object.fromEntries(
@@ -115,37 +115,23 @@ export default function Page() {
               : {},
           };
         } else if (file.type === "file") {
+          setSelectedFile(file);
           if (isRootFolder) {
             mountStructure[file.name] = {
-              file: {
-                contents: file.content || "",
-              },
+              file: { contents: file.content || "" },
             };
           } else {
-            // For files, create a file entry with contents
-            return {
-              file: {
-                contents: file.content || "",
-              },
-            };
+            return { file: { contents: file.content || "" } };
           }
         }
-
         return mountStructure[file.name];
       };
-
-      // Process each top-level file/folder
       files.forEach((file) => processFile(file, true));
-
       return mountStructure;
     };
 
     const mountStructure = createMountStructure(files);
-
-    // Mount the structure if WebContainer is available
-    console.log(mountStructure);
-    console.log("cont", webcontainer);
-    webcontainer?.mount(mountStructure);
+    webcontainer.mount(mountStructure);
   }, [files, webcontainer]);
 
   return (
@@ -158,7 +144,7 @@ export default function Page() {
           <Thread />
         </SidebarInset>
         <FileExplorer files={files} onFileSelect={setSelectedFile} />
-        <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
+        <div className="col-span-2 bg-black rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
           <TabView activeTab={activeTab} onTabChange={setActiveTab} />
           <div className="h-[calc(100%-4rem)]">
             {activeTab === "code" && <CodeEditor file={selectedFile} />}
