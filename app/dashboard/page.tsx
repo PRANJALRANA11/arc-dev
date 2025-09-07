@@ -9,15 +9,21 @@ import {
 } from "@/components/ui/sidebar";
 import { useWebContainer } from "../hooks/useWebContainer";
 import { FileItem } from "@/lib/types";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/contextApi";
 import { Step, StepType } from "@/lib/types";
+import { FileExplorer } from "@/components/fileExplorer";
+import { CodeEditor } from "@/components/codeEditor";
+import { TabView } from "@/components/tabView";
+import { PreviewFrame } from "@/components/previewPage";
+import { WebContainer } from "@webcontainer/api";
 export default function Page() {
   const { allSteps, setAllSteps } = useContext(AppContext);
   const { files, setFiles } = useContext(AppContext);
   const { selectedFile, setSelectedFile } = useContext(AppContext);
+  const [activeTab, setActiveTab] = useState<"code" | "preview">("code");
 
-  const webcontainer = useWebContainer();
+  const webcontainer: WebContainer | undefined = useWebContainer();
 
   useEffect(() => {
     let originalFiles = [...files];
@@ -138,6 +144,7 @@ export default function Page() {
 
     // Mount the structure if WebContainer is available
     console.log(mountStructure);
+    console.log("cont", webcontainer);
     webcontainer?.mount(mountStructure);
   }, [files, webcontainer]);
 
@@ -150,6 +157,16 @@ export default function Page() {
           <SidebarTrigger className="absolute top-4 left-4" />
           <Thread />
         </SidebarInset>
+        <FileExplorer files={files} onFileSelect={setSelectedFile} />
+        <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
+          <TabView activeTab={activeTab} onTabChange={setActiveTab} />
+          <div className="h-[calc(100%-4rem)]">
+            {activeTab === "code" && <CodeEditor file={selectedFile} />}
+            {activeTab === "preview" && webcontainer && (
+              <PreviewFrame files={files} webContainer={webcontainer} />
+            )}
+          </div>
+        </div>
       </div>
     </SidebarProvider>
   );
