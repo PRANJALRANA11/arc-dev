@@ -17,17 +17,31 @@ import { CodeEditor } from "@/components/codeEditor";
 import { TabView } from "@/components/tabView";
 import { PreviewFrame } from "@/components/previewPage";
 import { WebContainer } from "@webcontainer/api";
+import { RightSidebar } from "@/components/rightSidebar";
 export default function Page() {
-  const { allSteps, setAllSteps } = useContext(AppContext);
-  const { files, setFiles } = useContext(AppContext);
-  const { selectedFile, setSelectedFile } = useContext(AppContext);
+  const {
+    allSteps,
+    setAllSteps,
+    setUrl,
+    files,
+    setFiles,
+    selectedFile,
+    setSelectedFile,
+    openPreviewFull,
+  } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState<"code" | "preview">("code");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [alreadyRunning, setAllReadyRunning] = useState(false);
 
   const webcontainer: WebContainer | undefined = useWebContainer();
+
   const delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   useEffect(() => {
+    if (files.length > 0) {
+      setIsSidebarOpen(true);
+    }
     const processStepsGradually = async () => {
       let originalFiles = [...files];
 
@@ -83,7 +97,7 @@ export default function Page() {
           setFiles([...originalFiles]);
 
           // Wait before processing the next step
-          await delay(5000); // adjust delay as needed (500ms here)
+          await delay(2000); // adjust delay as needed (500ms here)
           // Mark this step as completed gradually
           setAllSteps((prev) =>
             prev.map((s) =>
@@ -134,25 +148,74 @@ export default function Page() {
     webcontainer.mount(mountStructure);
   }, [files, webcontainer]);
 
+  useEffect(() => {
+    const run = async () => {
+      const ifTrue = allSteps.find((s) => s.type == StepType.RunScript);
+      if (ifTrue && !alreadyRunning) {
+        setAllReadyRunning(true);
+        await runInstall();
+        runDevServer();
+      }
+    };
+    run();
+  }, [allSteps]);
+
+  async function runInstall() {
+    if (!webcontainer) return;
+    console.log("running");
+    const installProcess = await webcontainer.spawn("npm", [
+      "install",
+      "--verbose",
+    ]);
+
+    installProcess.output.pipeTo(
+      new WritableStream({
+        write(data) {
+          console.log(data);
+        },
+      })
+    );
+    return installProcess.exit;
+  }
+
+  async function runDevServer() {
+    if (!webcontainer) return;
+    await webcontainer.spawn("npm", ["run", "dev"]);
+
+    // Wait for `server-ready` event
+    webcontainer.on("server-ready", (port, url) => {
+      // ...
+      console.log(url);
+      console.log(port);
+      setUrl(url);
+      setAllSteps((prev): Step[] =>
+        prev.map((s): Step => ({ ...s, status: "completed" }))
+      );
+      // setAllReadyRunning(false);
+    });
+  }
+
   return (
     <SidebarProvider>
-      <div className="flex h-dvh w-full">
+      <div className="flex h-dvh w-full  text-white">
+        {/* Sidebar */}
         <ThreadListSidebar />
+
+        {/* Main Content */}
         <SidebarInset>
-          {/* Add sidebar trigger, location can be customized */}
-          <SidebarTrigger className="absolute top-4 left-4" />
+          <SidebarTrigger className="absolute top-4 left-4 text-blue-400 hover:text-blue-300" />
           <Thread />
         </SidebarInset>
-        <FileExplorer files={files} onFileSelect={setSelectedFile} />
-        <div className="col-span-2 bg-black rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
-          <TabView activeTab={activeTab} onTabChange={setActiveTab} />
-          <div className="h-[calc(100%-4rem)]">
-            {activeTab === "code" && <CodeEditor file={selectedFile} />}
-            {activeTab === "preview" && webcontainer && (
-              <PreviewFrame files={files} webContainer={webcontainer} />
-            )}
-          </div>
-        </div>
+
+        <RightSidebar
+          isOpen={isSidebarOpen}
+          files={files}
+          selectedFile={selectedFile}
+          setSelectedFile={setSelectedFile}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          webcontainer={webcontainer}
+        />
       </div>
     </SidebarProvider>
   );

@@ -76,7 +76,7 @@ const ThreadScrollToBottom: FC = () => {
       <TooltipIconButton
         tooltip="Scroll to bottom"
         variant="outline"
-        className="dark:bg-background dark:hover:bg-accent absolute -top-12 z-10 self-center rounded-full p-4 disabled:invisible"
+        // className="dark:bg-background dark:hover:bg-accent absolute -top-12 z-10 self-center rounded-full p-4 disabled:invisible"
       >
         <ArrowDownIcon />
       </TooltipIconButton>
@@ -176,7 +176,7 @@ const Composer: FC = () => {
       <ThreadPrimitive.Empty>
         <ThreadWelcomeSuggestions />
       </ThreadPrimitive.Empty>
-      <ComposerPrimitive.Root className="relative flex w-full flex-col rounded-2xl focus-within:ring-2 focus-within:ring-black focus-within:ring-offset-2 dark:focus-within:ring-white">
+      <ComposerPrimitive.Root className="relative flex w-full flex-col rounded-2xl focus-within:ring-2 focus-within:ring-black focus-within:ring-offset-2 ">
         <ComposerPrimitive.Input
           placeholder="Send a message..."
           className="bg-muted border-border dark:border-muted-foreground/15 focus:outline-primary placeholder:text-muted-foreground max-h-[calc(50dvh)] min-h-16 w-full resize-none rounded-t-2xl border-x border-t px-4 pb-3 pt-2 text-base outline-none"
@@ -209,7 +209,7 @@ const ComposerAction: FC = () => {
           <Button
             type="submit"
             variant="default"
-            className="dark:border-muted-foreground/90 border-muted-foreground/60 hover:bg-primary/75 size-8 rounded-full border"
+            className="dark:border-muted-foreground/90 border-muted-foreground/60 hover:bg-primary/75  rounded-full border"
             aria-label="Send message"
           >
             <ArrowUpIcon className="size-5" />
@@ -222,7 +222,7 @@ const ComposerAction: FC = () => {
           <Button
             type="button"
             variant="default"
-            className="dark:border-muted-foreground/90 border-muted-foreground/60 hover:bg-primary/75 size-8 rounded-full border"
+            className="dark:border-muted-foreground/90 border-muted-foreground/60 hover:bg-primary/75  rounded-full border"
             aria-label="Stop generating"
           >
             <Square className="size-3.5 fill-white dark:size-4 dark:fill-black" />
@@ -267,7 +267,7 @@ export const AssistantMessage: FC = () => {
   return (
     <MessagePrimitive.Root asChild>
       <motion.div
-        className="relative mx-auto w-full max-w-[var(--thread-max-width)]  grid-rows-[auto_1fr]  py-4"
+        className="relative mx-auto w-full max-w-[var(--thread-max-width)] ml-6 grid-rows-[auto_1fr]  py-4"
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role="assistant"

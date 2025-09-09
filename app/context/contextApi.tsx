@@ -10,6 +10,10 @@ interface AppContextType {
   setFiles: Dispatch<SetStateAction<FileItem[]>>;
   selectedFile: FileItem | null;
   setSelectedFile: Dispatch<SetStateAction<FileItem | null>>;
+  url: string;
+  setUrl: Dispatch<SetStateAction<string>>;
+  openPreviewFull: boolean;
+  setOpenPreviewFull: Dispatch<SetStateAction<boolean>>;
 }
 
 // Provide default values
@@ -20,4 +24,8 @@ export const AppContext = createContext<AppContextType>({
   setFiles: () => {},
   selectedFile: null,
   setSelectedFile: () => {},
+  url: "",
+  setUrl: () => {},
+  openPreviewFull: false,
+  setOpenPreviewFull: () => {},
 });

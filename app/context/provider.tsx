@@ -11,6 +11,8 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [allSteps, setAllSteps] = useState<Step[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [url, setUrl] = useState<string>("");
+  const [openPreviewFull, setOpenPreviewFull] = useState<boolean>(false);
 
   return (
     <AppContext.Provider
@@ -21,6 +23,10 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         setFiles,
         selectedFile,
         setSelectedFile,
+        url,
+        setUrl,
+        setOpenPreviewFull,
+        openPreviewFull,
       }}
     >
       {children}

@@ -239,10 +239,7 @@ export function TreeView({
 
   return (
     <motion.div
-      className={cn(
-        "w-full bg-background border border-border rounded-xl",
-        className
-      )}
+      className={cn("w-full bg-background rounded-xl", className)}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}

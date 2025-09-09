@@ -1,15 +1,30 @@
 import React from "react";
-import Editor from "@monaco-editor/react";
+import Editor, { loader } from "@monaco-editor/react";
 import { FileItem } from "../lib/types";
 
 interface CodeEditorProps {
   file: FileItem | null;
 }
 
+const customTheme = {
+  base: "vs-dark",
+  inherit: true,
+  rules: [],
+  colors: {
+    "editor.background": "#000000", // Full black background
+  },
+};
+
 export function CodeEditor({ file }: CodeEditorProps) {
+  React.useEffect(() => {
+    loader.init().then((monaco) => {
+      monaco.editor.defineTheme("full-black", customTheme);
+    });
+  }, []);
+
   if (!file) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-400">
+      <div className="h-full flex items-center  bg-background justify-center text-gray-400 ">
         Select a file to view its contents
       </div>
     );
@@ -19,7 +34,7 @@ export function CodeEditor({ file }: CodeEditorProps) {
     <Editor
       height="100%"
       defaultLanguage="typescript"
-      theme="vs-dark"
+      theme="full-black"
       value={file.content || ""}
       options={{
         readOnly: true,
