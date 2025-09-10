@@ -1,12 +1,13 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { cn } from "@/lib/utils";
 import { BorderBeam } from "../magicui/border-beam";
-import { SignInButton, SignOutButton, SignUpButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import CalcomEmbed from "../calcom-invite-embed";
+import Image from "next/image";
 const transitionVariants = {
   item: {
     hidden: {
@@ -68,6 +69,8 @@ export function HeroSection() {
                 },
               }}
               className="absolute inset-0 -z-20"
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
             ></AnimatedGroup>
             {/* <div
               aria-hidden
@@ -75,13 +78,17 @@ export function HeroSection() {
             /> */}
             <div className="mx-auto max-w-7xl px-6">
               <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
-                <AnimatedGroup variants={transitionVariants}>
+                <AnimatedGroup
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  variants={transitionVariants}
+                >
                   <Link
                     href="#link"
                     className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-black/5 transition-all duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
                   >
                     <span className="text-foreground text-sm">
-                      Unify search. Eliminate clutter. Boost productivity.
+                      Build UIs. Faster. Easier.
                     </span>
                     <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
 
@@ -98,15 +105,16 @@ export function HeroSection() {
                   </Link>
 
                   <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                    Personal Search Agent For Your Internal Tools
+                    Build Your UI In Minutes
                   </h1>
                   <p className="mx-auto mt-8 max-w-2xl text-balance text-lg">
-                    Your AI-powered assistant that helps you find exactly what
-                    you need across all your internal tools — instantly.
+                    Your AI-powered assistant that helps you build — instantly.
                   </p>
                 </AnimatedGroup>
 
                 <AnimatedGroup
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
                   variants={{
                     container: {
                       visible: {
@@ -141,6 +149,8 @@ export function HeroSection() {
             </div>
 
             <AnimatedGroup
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
               variants={{
                 container: {
                   visible: {
@@ -161,14 +171,14 @@ export function HeroSection() {
                 <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                   <img
                     className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-                    src="https://tailark.com//_next/image?url=%2Fmail2.png&w=3840&q=75"
+                    src="demo.png"
                     alt="app screen"
                     width="2700"
                     height="1440"
                   />
                   <img
                     className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-                    src="https://tailark.com/_next/image?url=%2Fmail2-light.png&w=3840&q=75"
+                    src="/demo.png"
                     alt="app screen"
                     width="2700"
                     height="1440"
@@ -233,7 +243,13 @@ const HeroHeader = () => {
                 aria-label="home"
                 className="flex items-center space-x-2"
               >
-                <Logo />
+                <Image
+                  src="/logo.png"
+                  alt="Sidebar Icon"
+                  width={64}
+                  height={64}
+                  className="aui-sidebar-header-icon"
+                />
               </Link>
 
               <button
@@ -277,7 +293,7 @@ const HeroHeader = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <SignInButton>
+                <SignInButton forceRedirectUrl="/dashboard">
                   <Button
                     asChild
                     variant="outline"
@@ -287,7 +303,7 @@ const HeroHeader = () => {
                     <span>Login</span>
                   </Button>
                 </SignInButton>
-                <SignUpButton>
+                <SignUpButton forceRedirectUrl="/dashboard">
                   <Button
                     asChild
                     size="sm"

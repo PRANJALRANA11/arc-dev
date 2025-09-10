@@ -1,6 +1,4 @@
 import * as React from "react";
-import { Github, MessagesSquare } from "lucide-react";
-import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
@@ -12,10 +10,14 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
+import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
+import Image from "next/image";
 
 export function ThreadListSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useUser();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="aui-sidebar-header mb-2 border-b">
@@ -23,16 +25,22 @@ export function ThreadListSidebar({
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
-                <Link href="https://assistant-ui.com" target="_blank" rel="noopener noreferrer">
+                <div>
                   <div className="aui-sidebar-header-icon-wrapper flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <MessagesSquare className="aui-sidebar-header-icon size-4" />
+                    <Image
+                      src="/logo.png"
+                      alt="Sidebar Icon"
+                      width={32}
+                      height={32}
+                      className="aui-sidebar-header-icon"
+                    />
                   </div>
                   <div className="aui-sidebar-header-heading mr-6 flex flex-col gap-0.5 leading-none">
                     <span className="aui-sidebar-header-title font-semibold">
-                      assistant-ui
+                      Arc
                     </span>
                   </div>
-                </Link>
+                </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -46,18 +54,19 @@ export function ThreadListSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link
-                href="https://github.com/assistant-ui/assistant-ui"
-                target="_blank"
-              >
+              <div>
                 <div className="aui-sidebar-footer-icon-wrapper flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Github className="aui-sidebar-footer-icon size-4" />
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
                 </div>
                 <div className="aui-sidebar-footer-heading flex flex-col gap-0.5 leading-none">
-                  <span className="aui-sidebar-footer-title font-semibold">GitHub</span>
-                  <span>View Source</span>
+                  <span className="aui-sidebar-footer-title font-semibold">
+                    {user?.fullName}
+                  </span>
+                  <span>{user?.emailAddresses[0].emailAddress}</span>
                 </div>
-              </Link>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

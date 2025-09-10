@@ -1,17 +1,18 @@
 import React from "react";
 import Editor, { loader } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 import { FileItem } from "../lib/types";
 
 interface CodeEditorProps {
   file: FileItem | null;
 }
 
-const customTheme = {
+const customTheme: editor.IStandaloneThemeData = {
   base: "vs-dark",
   inherit: true,
   rules: [],
   colors: {
-    "editor.background": "#000000", // Full black background
+    "editor.background": "#000000",
   },
 };
 
@@ -24,7 +25,7 @@ export function CodeEditor({ file }: CodeEditorProps) {
 
   if (!file) {
     return (
-      <div className="h-full flex items-center  bg-background justify-center text-gray-400 ">
+      <div className="h-full flex items-center bg-background justify-center text-gray-400">
         Select a file to view its contents
       </div>
     );

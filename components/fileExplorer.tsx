@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FolderTree } from "lucide-react";
+
 import { FileItem, FileViewItem } from "../lib/types";
 
 import { TreeNode, TreeView } from "./ui/tree-view";

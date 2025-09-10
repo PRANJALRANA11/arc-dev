@@ -1,14 +1,9 @@
 "use client";
-import { FileItem, Step } from "@/lib/types";
-import { WebContainer } from "@webcontainer/api";
-import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "@/app/context/contextApi";
-interface PreviewFrameProps {
-  files: FileItem[];
-  webContainer: WebContainer | undefined;
-}
 
-export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
+import React, { useContext } from "react";
+import { AppContext } from "@/app/context/contextApi";
+
+export function PreviewFrame() {
   const { url } = useContext(AppContext);
 
   return (

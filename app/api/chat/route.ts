@@ -7,13 +7,13 @@ export const maxDuration = 300;
 export const SYS_PROMPT = getSystemPrompt();
 
 // Simple in-memory cache (will reset when server restarts)
-let cachedResponse: ReturnType<typeof streamText> | null = null;
+// let cachedResponse: ReturnType<typeof streamText> | null = null;
 
 export async function POST(req: Request) {
-  if (cachedResponse) {
-    console.log("Returning cached response");
-    return cachedResponse.toUIMessageStreamResponse();
-  }
+  // if (cachedResponse) {
+  //   console.log("Returning cached response");
+  //   return cachedResponse.toUIMessageStreamResponse();
+  // }
 
   const { messages, system, tools } = await req.json();
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     },
   });
 
-  cachedResponse = result;
+  // cachedResponse = result;
   console.log("Caching AI response for future calls");
 
   return result.toUIMessageStreamResponse();

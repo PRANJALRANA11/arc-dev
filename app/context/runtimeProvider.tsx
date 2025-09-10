@@ -15,6 +15,7 @@ export function MyRuntimeProvider({
   children: ReactNode;
 }>) {
   const runtime = useChatRuntime({
+    // @ts-ignore
     api: "/api/v1/chat",
     cloud,
 
