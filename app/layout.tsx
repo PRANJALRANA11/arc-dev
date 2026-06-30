@@ -32,8 +32,6 @@ export default function RootLayout({
       appearance={{
         baseTheme: [dark],
       }}
-      signInUrl="/signin"
-      signUpUrl="/signup"
     >
       <AppProvider>
         <MyRuntimeProvider>
