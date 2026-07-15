@@ -27,6 +27,9 @@ const transitionVariants = {
   },
 };
 
+const heroVideoSrc =
+  "https://1fdfqyad2nxrq4jx.public.blob.vercel-storage.com/demo.mp4";
+
 export function HeroSection() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const [isHeroVideoPlaying, setIsHeroVideoPlaying] = React.useState(false);
@@ -187,7 +190,7 @@ export function HeroSection() {
                       onPause={() => setIsHeroVideoPlaying(false)}
                       onEnded={() => setIsHeroVideoPlaying(false)}
                     >
-                      <source src="/demo.mp4" type="video/mp4" />
+                      <source src={heroVideoSrc} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                     {!isHeroVideoPlaying && (
