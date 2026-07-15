@@ -1,10 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { cn } from "@/lib/utils";
-import { BorderBeam } from "../magicui/border-beam";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import CalcomEmbed from "../calcom-invite-embed";
 import Image from "next/image";
@@ -29,6 +28,13 @@ const transitionVariants = {
 };
 
 export function HeroSection() {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [isHeroVideoPlaying, setIsHeroVideoPlaying] = React.useState(false);
+
+  const handleHeroVideoPlay = () => {
+    videoRef.current?.play();
+  };
+
   return (
     <>
       <HeroHeader />
@@ -166,35 +172,37 @@ export function HeroSection() {
               <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
                 <div
                   aria-hidden
-                  className="bg-gradient-to-b to-black absolute inset-0 z-10 from-transparent from-35%"
+                  className="pointer-events-none bg-gradient-to-b to-black absolute inset-0 z-10 from-transparent from-35%"
                 />
-                <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
-                  <img
-                    className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-                    src="demo.png"
-                    alt="app screen"
-                    width="2700"
-                    height="1440"
-                  />
-                  <img
-                    className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-                    src="/demo.png"
-                    alt="app screen"
-                    width="2700"
-                    height="1440"
-                  />
-                  <BorderBeam
-                    duration={6}
-                    size={400}
-                    className="from-transparent via-red-500 to-transparent"
-                  />
-                  <BorderBeam
-                    duration={6}
-                    delay={3}
-                    size={400}
-                    borderWidth={2}
-                    className="from-transparent via-green-500 to-transparent"
-                  />
+                <div className="inset-shadow-2xs ring-background  relative mx-auto max-w-6xl overflow-hidden rounded-2xl  shadow-lg  ring-1">
+                  <div className="relative overflow-hidden rounded-2xl">
+                    <video
+                      ref={videoRef}
+                      className="bg-background aspect-15/8 w-full object-cover"
+                      controls
+                      playsInline
+                      preload="metadata"
+                      // poster="/demo.png"
+                      onPlay={() => setIsHeroVideoPlaying(true)}
+                      onPause={() => setIsHeroVideoPlaying(false)}
+                      onEnded={() => setIsHeroVideoPlaying(false)}
+                    >
+                      <source src="/demo.mp4" type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    {!isHeroVideoPlaying && (
+                      <button
+                        type="button"
+                        aria-label="Play video"
+                        onClick={handleHeroVideoPlay}
+                        className="absolute inset-0 z-30 flex items-center justify-center bg-black/10 transition-colors hover:bg-black/20"
+                      >
+                        <span className="flex size-20 items-center justify-center rounded-full bg-white/90 text-black shadow-xl ring-1 ring-black/10 backdrop-blur-sm transition-transform hover:scale-105">
+                          <Play className="ml-1 size-8 fill-current" />
+                        </span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </AnimatedGroup>
