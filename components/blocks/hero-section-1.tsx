@@ -38,6 +38,20 @@ export function HeroSection() {
     videoRef.current?.play();
   };
 
+  React.useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    video.muted = true;
+    video.load();
+    video.play().catch(() => {
+      setIsHeroVideoPlaying(false);
+    });
+  }, []);
+
   return (
     <>
       <HeroHeader />
@@ -182,15 +196,19 @@ export function HeroSection() {
                     <video
                       ref={videoRef}
                       className="bg-background aspect-15/8 w-full object-cover"
+                      autoPlay
                       controls
+                      crossOrigin="anonymous"
+                      loop
+                      muted
                       playsInline
-                      preload="metadata"
-                      // poster="/demo.png"
+                      preload="auto"
+                      poster="/demo.png"
+                      src={heroVideoSrc}
                       onPlay={() => setIsHeroVideoPlaying(true)}
                       onPause={() => setIsHeroVideoPlaying(false)}
                       onEnded={() => setIsHeroVideoPlaying(false)}
                     >
-                      <source src={heroVideoSrc} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                     {!isHeroVideoPlaying && (
